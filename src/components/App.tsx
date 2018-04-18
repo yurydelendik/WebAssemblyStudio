@@ -156,6 +156,7 @@ export interface AppProps {
 export class App extends React.Component<AppProps, AppState> {
   fiddle: string;
   toastContainer: ToastContainer;
+  editorsContainer: Split;
   constructor(props: AppProps) {
     super(props);
     this.state = {
@@ -289,6 +290,15 @@ export class App extends React.Component<AppProps, AppState> {
       console.log("App.forceUpdate because of window resize.");
       this.forceUpdate();
     }, false);
+
+    // Monitoring selections, and if editors container got selected
+    // we want to reset it.
+    window.addEventListener("selectionchange", () => {
+      const node = ReactDOM.findDOMNode(this.editorsContainer);
+      if (window.getSelection().containsNode(node, false)) {
+        window.getSelection().removeAllRanges();
+      }
+    }, true);
   }
 
   share() {
@@ -521,6 +531,7 @@ export class App extends React.Component<AppProps, AppState> {
         this.setState({ editorSplits: splits });
         layout();
       }}
+      ref={(ref) => this.editorsContainer = ref}
     >
       {makeEditorPanes()}
     </Split>;
